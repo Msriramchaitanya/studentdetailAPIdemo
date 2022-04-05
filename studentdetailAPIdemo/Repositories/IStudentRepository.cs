@@ -8,10 +8,11 @@ namespace studentdetailAPIdemo.Repositories
 {
     public interface IStudentRepository
     {
-        public studentDetails AddStudent(studentDetails detail);
+        public Task< studentDetails> AddStudent(studentDetails detail);
        
-        IEnumerable<studentDetails> GetStudentDetails();
-        public void DeleteStudent(int studentId);
-       public studentDetails UpdateStudent(studentDetails detail);
+         Task< IEnumerable<studentDetails>> GetStudentDetails();
+        public Task DeleteStudent(int studentId);
+       public Task<studentDetails> UpdateStudent(studentDetails detail);
+       Task< studentDetails >GetStudentDetailsById(int Id );
     }
 }

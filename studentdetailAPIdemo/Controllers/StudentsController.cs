@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoFixture.Xunit2;
+using Microsoft.AspNetCore.Mvc;
 using studentdetailAPIdemo.Models;
 using studentdetailAPIdemo.Repositories;
 using System;
@@ -10,8 +11,10 @@ using System.Threading.Tasks;
 
 namespace studentdetailAPIdemo.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
+    
     public class StudentsController : ControllerBase
     {
         // GET: api/<StudentsController>
@@ -23,40 +26,41 @@ namespace studentdetailAPIdemo.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<studentDetails> Get()
+        public async Task< IEnumerable<studentDetails>> Get()
         {
-            return _repo.GetStudentDetails();
+            return await _repo.GetStudentDetails();
         }
        
 
         // GET api/<StudentsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task< studentDetails > Get(int id)
         {
-            return "value";
+            var result=await _repo.GetStudentDetailsById(id);
+            return result;
         }
-
+       
         // POST api/<StudentsController>
         [HttpPost]
-        public studentDetails  Post([FromBody] studentDetails value)
+        public async Task< studentDetails>  Post([FromBody] studentDetails value)
         {
-            return _repo.AddStudent(value);
+            return await _repo.AddStudent(value);
             
 
         }
 
         // PUT api/<StudentsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] studentDetails value)
+        public async Task Put(int id, [FromBody] studentDetails value)
         {
-             _repo.UpdateStudent(value);
+             await _repo.UpdateStudent(value);
         }
 
         // DELETE api/<StudentsController>/5
         [HttpDelete]
-        public void Delete(studentDetails Student)
+        public async Task Delete(studentDetails Student)
         {
-            _repo.DeleteStudent(Student.studentId);
+            await _repo.DeleteStudent(Student.studentId);
         }
     }
 }

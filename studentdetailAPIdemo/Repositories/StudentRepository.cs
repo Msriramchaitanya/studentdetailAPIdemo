@@ -17,44 +17,46 @@ namespace studentdetailAPIdemo.Repositories
         {
          dbContext = DbContext;
         }
-        public studentDetails  AddStudent(studentDetails detail)
+        public async Task< studentDetails>  AddStudent(studentDetails detail)
         {
 
             dbContext.studentDetails.Add(detail);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
             return detail;
             
 
             
         }
 
-        public void DeleteStudent(int studentId)
+       
+        public async Task DeleteStudent(int studentId)
         {
-            SqlParameter intake = new SqlParameter("@ID",studentId);
-            dbContext.studentDetails.FromSqlRaw("DeleteStudentDetail @ID",intake).ToList();
-         }
-
-        public IEnumerable<studentDetails> GetStudentDetails()
-        {
-            //var categories = dbContext.studentDetails.ToList();
-            //return categories;
-            return  dbContext.studentDetails.ToList();
+            var Detail = await dbContext.studentDetails.FirstOrDefaultAsync(a => a.studentId == studentId);
+            dbContext.Entry(Detail).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await dbContext.SaveChangesAsync();
+            
         }
 
-        public studentDetails UpdateStudent(studentDetails detail)
+        public async Task< IEnumerable<studentDetails>> GetStudentDetails()
+        {
+           
+            return  await dbContext.studentDetails.ToListAsync();
+        }
+
+        public  async Task< studentDetails> GetStudentDetailsById(int Id)
+        {
+            var Details = await dbContext.studentDetails.Where(a => a.studentId == Id).Select(a => a).ToListAsync();
+            return Details.FirstOrDefault();
+
+        }
+       
+        public async Task< studentDetails> UpdateStudent(studentDetails detail)
         {
             //SqlParameter update = new SqlParameter();
             dbContext.studentDetails.Update(detail);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
             return detail;
         }
-        //public studentDetails UpdateStudent(studentDetails detail)
-        //{
-        //    SqlParameter update = new SqlParameter("@Student_ID",detail);
-        //    dbContext.studentDetails.FromSqlRaw("UpdateStudentDetails @Student_ID",update);
-        //    //dbContext.studentDetails.Update(detail);
-        //    dbContext.SaveChanges();
-        //    return detail;
-        //}
+        
     }
 }

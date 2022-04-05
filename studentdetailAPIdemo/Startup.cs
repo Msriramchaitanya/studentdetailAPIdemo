@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using studentdetailAPIdemo.Data;
+using studentdetailAPIdemo.Models;
 using studentdetailAPIdemo.Repositories;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,25 @@ namespace studentdetailAPIdemo
         }
 
         public IConfiguration Configuration { get; }
+        string policy = "FirstPolicy";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddDbContext<StudentContext>(option => option.UseSqlServer(Configuration.GetConnectionString("StudentContext")));
+            services.AddScoped<IProductsRepository, ProductRepository>();
             //services.AddRazorPages();
+            services.Configure<MongoSettings>(Configuration.GetSection(MongoSettings.MongoSection));
+            services.AddScoped<IProductsContext, ProductsContext>();
+            
+            services.AddCors(a => a.AddPolicy(name:policy,a=> {
+
+                a.AllowAnyOrigin();
+                a.AllowAnyMethod();
+                a.AllowAnyHeader();
+                }));
+
             services.AddSwaggerGen(options=>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -62,7 +75,10 @@ namespace studentdetailAPIdemo
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseCors(a => a.AllowAnyMethod());
+            app.UseCors(a => a.AllowAnyOrigin());
+            app.UseCors(a => a.AllowAnyHeader());
+            app.UseCors(policy);
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
